@@ -3,6 +3,7 @@ package ru.sovkom.backend.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -12,7 +13,9 @@ import org.hibernate.annotations.OnDeleteAction;
  * Сущность содержимого корзины
  */
 @Data
+@Builder
 @Entity
+@Table(name = "cart_items")
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItem {
@@ -34,4 +37,9 @@ public class CartItem {
 
     @Column(nullable = false)
     private int quantity;
+
+    @Override
+    public String toString() {
+        return "CartItem{id=" + id + ", quantity='" + quantity + "'}";
+    }
 }

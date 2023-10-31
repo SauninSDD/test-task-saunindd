@@ -16,12 +16,12 @@ import com.vaadin.flow.shared.Registration;
 import ru.sovkom.backend.entities.Dish;
 
 public class DishForm extends FormLayout {
-    TextField name = new TextField("Name");
-    NumberField price = new NumberField("Price");
+    TextField name = new TextField("Название");
+    NumberField price = new NumberField("Стоимость");
 
-    Button save = new Button("Save");
-    Button delete = new Button("Delete");
-    Button close = new Button("Cancel");
+    Button save = new Button("Сохранить");
+    Button delete = new Button("Удалить");
+    Button close = new Button("Закрыть");
     Binder<Dish> binder = new BeanValidationBinder<>(Dish.class);
 
     public DishForm() {
@@ -59,10 +59,10 @@ public class DishForm extends FormLayout {
         binder.setBean(dish);
     }
 
-    public static abstract class ContactFormEvent extends ComponentEvent<DishForm> {
+    public static abstract class DishFormEvent extends ComponentEvent<DishForm> {
         private final Dish dish;
 
-        protected ContactFormEvent(DishForm source, Dish dish) {
+        protected DishFormEvent(DishForm source, Dish dish) {
             super(source, false);
             this.dish = dish;
         }
@@ -72,20 +72,20 @@ public class DishForm extends FormLayout {
         }
     }
 
-    public static class SaveEvent extends ContactFormEvent {
+    public static class SaveEvent extends DishFormEvent {
         SaveEvent(DishForm source, Dish dish) {
             super(source, dish);
         }
     }
 
-    public static class DeleteEvent extends ContactFormEvent {
+    public static class DeleteEvent extends DishFormEvent {
         DeleteEvent(DishForm source, Dish dish) {
             super(source, dish);
         }
 
     }
 
-    public static class CloseEvent extends ContactFormEvent {
+    public static class CloseEvent extends DishFormEvent {
         CloseEvent(DishForm source) {
             super(source, null);
         }

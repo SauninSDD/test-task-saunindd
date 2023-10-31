@@ -1,5 +1,6 @@
 package ru.sovkom.backend.services;
 
+import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
 
 import java.util.List;
@@ -11,11 +12,11 @@ public interface CartService {
     /**
      * Добавление блюда в корзину
      *
-     * @param clientId Уникальный идентификатор пользователя
+     * @param cartId Уникальный идентификатор пользователя
      * @param dishId   Уникальный идентификатор блюда
      * @return Возвращает статус добавления блюда в корзину
      */
-    boolean addToCart(long clientId, long dishId);
+    boolean addToCart(long cartId, long dishId, int quantity);
 
     /**
      * Удаление блюда из корзины
@@ -74,5 +75,10 @@ public interface CartService {
      */
     List<CartItem> getCartItemsByCartId(long cartId);
 
+    List<Cart> getAllCarts();
+
+    Cart getCartIdByClientId(String clientId);
+
+    Cart getCartIdByClientId(long clientId);
 
 }

@@ -2,6 +2,7 @@ package ru.sovkom.backend.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -13,6 +14,7 @@ import java.util.List;
  * Сущность корзины клиента
  */
 @Data
+@Builder
 @Table(name = "carts")
 @Entity
 @NoArgsConstructor
@@ -28,6 +30,11 @@ public class Cart {
     @JoinColumn(name = "id_client", nullable = false)
     private Client client;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<CartItem> cartItems;
+
+    @Override
+    public String toString() {
+        return id.toString();
+    }
 }

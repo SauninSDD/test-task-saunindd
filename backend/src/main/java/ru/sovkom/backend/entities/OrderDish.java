@@ -1,6 +1,8 @@
 package ru.sovkom.backend.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -10,7 +12,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Embeddable
 @Table(name = "orders_dishes")
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrderDish {
     @Id
     @Column(name = "id_order_dish")
@@ -28,7 +32,7 @@ public class OrderDish {
     private Dish dish;
 
     @Column
-    private byte orderDishValue;
+    private int orderDishValue;
 
 
 

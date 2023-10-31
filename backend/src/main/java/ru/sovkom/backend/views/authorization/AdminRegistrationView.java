@@ -27,7 +27,7 @@ public class AdminRegistrationView extends VerticalLayout {
     private final PasswordField password = new PasswordField("Пароль");
     private final PasswordField confirmPassword = new PasswordField("Повторите пароль");
 
-    private final Button registerButton = new Button("Зарегестрироваться");
+    private final Button registerButton = new Button("Зарегистрироваться");
 
     private final Button loginButton = new Button("Вернуться к авторизации");
 

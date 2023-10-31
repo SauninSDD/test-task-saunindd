@@ -1,14 +1,14 @@
 package ru.sovkom.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +17,7 @@ import java.util.Set;
  * Сущность клиента ресторана
  */
 @Data
+@Builder
 @Table(name = "clients")
 @Entity
 @NoArgsConstructor
@@ -51,6 +52,8 @@ public class Client {
             joinColumns = @JoinColumn(name = "id_client"),
             inverseJoinColumns = @JoinColumn(name = "id_dish"))
     private Set<Dish> dishesFavorites = new HashSet<>();
+
+
 
 
 }

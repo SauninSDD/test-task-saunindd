@@ -32,7 +32,7 @@ public class DishServiceImpl implements DishService{
 
     @Override
     public List<Dish> getListDishes() {
-        log.info("Получает все блюда в филиале");
+        log.info("Получает все блюда");
         return dishRepository.findAll();
     }
 

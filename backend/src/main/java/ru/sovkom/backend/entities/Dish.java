@@ -30,4 +30,9 @@ public class Dish {
 
     @OneToMany(mappedBy = "dish", fetch = FetchType.EAGER)
     private Set<OrderDish> dishesInOrder = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

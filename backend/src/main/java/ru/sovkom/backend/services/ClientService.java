@@ -1,5 +1,7 @@
 package ru.sovkom.backend.services;
 
+import ru.sovkom.backend.entities.Cart;
+import ru.sovkom.backend.entities.CartItem;
 import ru.sovkom.backend.entities.Client;
 
 import java.util.Date;
@@ -14,9 +16,8 @@ public interface ClientService {
      * Регистрирует пользователя
      *
      * @param client Данные о пользователе
-     * @return Возвращает идентификатор созданного пользователя
      */
-    long signUp(Client client);
+    void saveClient(Client client);
 
     /**
      * Производит поиск пользователя по id
@@ -63,4 +64,7 @@ public interface ClientService {
 
     List<Client> getUsersByUsername(String name);
 
+    List<Client> getAllUsers();
+
+    List<CartItem> getClientCart(String clientId);
 }

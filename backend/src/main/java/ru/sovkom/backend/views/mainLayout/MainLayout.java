@@ -10,8 +10,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import ru.sovkom.backend.security.SecurityService;
+import ru.sovkom.backend.views.carts.CartsView;
 import ru.sovkom.backend.views.dishes.ListDishesView;
 import ru.sovkom.backend.views.clients.ListClientsView;
+import ru.sovkom.backend.views.orders.ListOrdersView;
 
 public class MainLayout extends AppLayout {
 
@@ -30,7 +32,8 @@ public class MainLayout extends AppLayout {
                 LumoUtility.Margin.MEDIUM);
 
             String u = securityService.getAuthenticatedUser().getUsername();
-        Button logout = new Button("Log out " + u, e -> securityService.logout());
+        Button logout = new Button("Выйти из профиля " + u, e -> securityService.logout());
+        logout.getStyle().set("color", "red");
 
         var header = new HorizontalLayout(new DrawerToggle(), logo, logout);
 
@@ -48,7 +51,9 @@ public class MainLayout extends AppLayout {
     private void createDrawer() {
         addToDrawer(new VerticalLayout(
                 new RouterLink("Клиенты", ListClientsView.class),
-                new RouterLink("Меню", ListDishesView.class)
+                new RouterLink("Меню", ListDishesView.class),
+                new RouterLink("Заказы", ListOrdersView.class),
+                new RouterLink("Корзины", CartsView.class)
         ));
     }
 }

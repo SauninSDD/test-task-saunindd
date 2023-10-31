@@ -9,11 +9,15 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.context.annotation.Scope;
 import ru.sovkom.backend.entities.Dish;
 import ru.sovkom.backend.services.DishService;
 import ru.sovkom.backend.views.mainLayout.MainLayout;
 
+@SpringComponent
+@Scope("prototype")
 @PageTitle("Dishes")
 @Route(value = "dishes", layout = MainLayout.class)
 @PermitAll
@@ -69,7 +73,7 @@ public class ListDishesView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassNames("dish-grid");
         grid.setSizeFull();
-        grid.setColumns("name", "price");
+        grid.setColumns("id", "name", "price");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
         grid.asSingleSelect().addValueChangeListener(event ->
@@ -77,12 +81,13 @@ public class ListDishesView extends VerticalLayout {
     }
 
     private Component getToolbar() {
-        filterText.setPlaceholder("Filter by name...");
+        filterText.setWidth("300px");
+        filterText.setPlaceholder("Найти блюдо по названию");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
 
-        Button addDishButton = new Button("Add dish");
+        Button addDishButton = new Button("Добавить блюдо");
         addDishButton.addClickListener(click -> addDish());
 
         var toolbar = new HorizontalLayout(filterText, addDishButton);

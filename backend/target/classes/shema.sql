@@ -11,7 +11,7 @@ create schema if not exists restaurant;
 
     INSERT INTO restaurant.carts(id_cart, id_client) VALUES (1,1);
 
-    INSERT INTO restaurant.cart_item(id_cart_item, quantity, id_cart, id_dish) VALUES (1,1,1,1);
+    INSERT INTO restaurant.cart_items(id_cart_item, quantity, id_cart, id_dish) VALUES (1,1,1,1);
 
     INSERT INTO restaurant.orders(id_order, order_track_number, id_client) VALUES (1,1123,1);
 

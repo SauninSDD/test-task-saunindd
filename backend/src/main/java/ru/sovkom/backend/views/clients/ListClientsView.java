@@ -59,7 +59,7 @@ public class ListClientsView extends VerticalLayout {
     }
 
     private void saveContact(ClientForm.SaveEvent event) {
-        clientService.signUp(event.getClient());
+        clientService.saveClient(event.getClient());
         updateList();
         closeClient();
     }
@@ -73,7 +73,7 @@ public class ListClientsView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassNames("client-grid");
         grid.setSizeFull();
-        grid.setColumns("username", "number", "email", "password");
+        grid.setColumns("id","username", "number", "email", "password");
 
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
@@ -82,12 +82,13 @@ public class ListClientsView extends VerticalLayout {
     }
 
     private Component getToolbar() {
-        filterText.setPlaceholder("Filter by name...");
+        filterText.setWidth("300px");
+        filterText.setPlaceholder("Найти клиента по имени");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
 
-        Button addClientButton = new Button("Add client");
+        Button addClientButton = new Button("Добавить клиента");
         addClientButton.addClickListener(click -> addClient());
 
         var toolbar = new HorizontalLayout(filterText, addClientButton);

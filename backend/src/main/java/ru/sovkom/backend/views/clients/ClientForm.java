@@ -17,14 +17,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.ComponentEventListener;
 
 public class ClientForm extends FormLayout {
-    TextField userName = new TextField("Name");
-    TextField number = new TextField("Number");
+    TextField userName = new TextField("Имя клиента");
+    TextField number = new TextField("Номер телефона");
     EmailField email = new EmailField("Email");
-    PasswordField password = new PasswordField("Password");
+    PasswordField password = new PasswordField("Пароль");
 
-    Button save = new Button("Save");
-    Button delete = new Button("Delete");
-    Button close = new Button("Cancel");
+    Button save = new Button("Сохранить");
+    Button delete = new Button("Удалить");
+    Button close = new Button("Закрыть");
     Binder<Client> binder = new BeanValidationBinder<>(Client.class);
 
     public ClientForm() {
@@ -66,10 +66,10 @@ public class ClientForm extends FormLayout {
         binder.setBean(client);
     }
 
-    public static abstract class ContactFormEvent extends ComponentEvent<ClientForm> {
+    public static abstract class ClientFormEvent extends ComponentEvent<ClientForm> {
         private final Client client;
 
-        protected ContactFormEvent(ClientForm source, Client client) {
+        protected ClientFormEvent(ClientForm source, Client client) {
             super(source, false);
             this.client = client;
         }
@@ -79,20 +79,20 @@ public class ClientForm extends FormLayout {
         }
     }
 
-    public static class SaveEvent extends ContactFormEvent {
+    public static class SaveEvent extends ClientFormEvent {
         SaveEvent(ClientForm source, Client client) {
             super(source, client);
         }
     }
 
-    public static class DeleteEvent extends ContactFormEvent {
+    public static class DeleteEvent extends ClientFormEvent {
         DeleteEvent(ClientForm source, Client client) {
             super(source, client);
         }
 
     }
 
-    public static class CloseEvent extends ContactFormEvent {
+    public static class CloseEvent extends ClientFormEvent {
         CloseEvent(ClientForm source) {
             super(source, null);
         }

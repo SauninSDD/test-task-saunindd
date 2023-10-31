@@ -7,6 +7,8 @@ import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
 import ru.sovkom.backend.entities.Client;
 import ru.sovkom.backend.entities.Dish;
+import ru.sovkom.backend.exceptions.CartNotFoundException;
+import ru.sovkom.backend.exceptions.EmptyCartIdException;
 import ru.sovkom.backend.repositories.CartItemRepository;
 import ru.sovkom.backend.repositories.CartRepository;
 import ru.sovkom.backend.repositories.ClientRepository;
@@ -34,50 +36,32 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public boolean addToCart(long cartId, long dishId) {
-        Optional<Cart> cart = cartRepository.findCartById(cartId);
-
-
-        Cart shoppingCart = cart.orElseGet(() -> {
-            Optional<Client> user = clientRepository.findById(cartId);
-            if (user.isPresent()) {
-                Cart newCart = new Cart();
-                newCart.setClient(user.get());
-
-                return cartRepository.save(newCart);
-            }
-
-            return null;
-        });
-
-        if (shoppingCart != null) {
-            Optional<CartItem> cartItem = shoppingCart.getCartItems().stream()
+    public boolean addToCart(long cartId, long dishId, int quantity) {
+        Optional<Cart> checkCartClient = cartRepository.findById(cartId);
+        Cart cartClient = checkCartClient.orElse(null);
+        if (checkCartClient.isPresent()) {
+            Optional<CartItem> cartItem = cartClient.getCartItems().stream()
                     .filter(item -> item.getDish().getId() == dishId)
                     .findFirst();
-
             if (cartItem.isPresent()) {
-                CartItem existingCartItem = cartItem.get();
-                existingCartItem.setQuantity(existingCartItem.getQuantity() + 1);
+                cartItem.get().setQuantity(quantity);
             } else {
-                CartItem newCartItem = new CartItem();
-                newCartItem.setCart(shoppingCart);
-
-                Optional<Dish> dish = dishRepository.findDishById(dishId);
-                Dish dishInCart = dish.orElse(null);
-                if (dish.isPresent()) {
-                    newCartItem.setDish(dishInCart);
-                    newCartItem.setQuantity(1);
-                    shoppingCart.getCartItems().add(newCartItem);
+                Optional<Dish> checkDish = dishRepository.findDishById(dishId);
+                Dish dish = checkDish.orElse(null);
+                if (checkDish.isPresent()) {
+                    CartItem newCartItem = CartItem.builder()
+                            .cart(cartClient)
+                            .dish(dish)
+                            .quantity(quantity)
+                            .build();
+                    cartClient.getCartItems().add(newCartItem);
                 } else {
                     return false;
                 }
             }
-
-            cartRepository.save(shoppingCart);
-
+            cartRepository.save(cartClient);
             return true;
         }
-
         return false;
     }
 
@@ -85,7 +69,6 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public boolean deleteDish(long cartId, long dishId) {
         cartItemRepository.deleteCartItemByCartIdAndDishId(cartId, dishId);
-
         return true;
     }
 
@@ -97,7 +80,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public boolean updateDishAmount(long clientId, long dishId, int quantity) {
-        Optional<Cart> cart = cartRepository.findCartById(clientId);
+        Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
 
         if (cart.isPresent()) {
             Cart shoppingCart = cart.get();
@@ -116,19 +99,19 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void deleteCart(long clientId) {
-        Optional<Cart> cart = cartRepository.findCartById(clientId);
+        Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
 
         if (cart.isPresent()) {
             long cartId = cart.get().getId();
-            cartItemRepository.deleteAll();
             cartRepository.deleteById(cartId);
         }
     }
 
     @Override
     public List<Long> getListOfDishIdsInCart(long cartId) {
-        Optional<Cart> cart = cartRepository.findCartById(cartId);
+        Optional<Cart> cart = cartRepository.findCartByClient_Id(cartId);
 
         if (cart.isPresent()) {
             Cart shoppingCart = cart.get();
@@ -138,23 +121,45 @@ public class CartServiceImpl implements CartService {
             for (CartItem cartItem : cartItems) {
                 dishIds.add(cartItem.getDish().getId());
             }
-
             return dishIds;
         } else {
-
             return Collections.emptyList();
         }
     }
 
     @Override
     public List<CartItem> getCartItemsByCartId(long cartId) {
-
         return cartItemRepository.findByCartId(cartId);
     }
 
     @Override
+    public List<Cart> getAllCarts() {
+        return cartRepository.findAll();
+    }
+
+    @Override
+    public Cart getCartIdByClientId(String clientId) {
+        if (clientId == null || clientId.isEmpty()) {
+            throw new EmptyCartIdException("Empty cart ID");
+        } else {
+            long longIdClient = Long.parseLong(clientId, 10);
+            Optional<Cart> cart = cartRepository.findCartByClient_Id(longIdClient);
+            return cart.orElseThrow(() -> new CartNotFoundException("Cart not found for client ID: " + clientId));
+        }
+    }
+
+    @Override
+    public Cart getCartIdByClientId(long clientId) {
+
+            Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
+            return cart.orElseThrow(() -> new CartNotFoundException("Cart not found for client ID: " + clientId));
+
+    }
+
+
+    @Override
     public int countDishesInCart(long clientId) {
-        Optional<Cart> cart = cartRepository.findCartById(clientId);
+        Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
 
         if (cart.isPresent()) {
             Cart shoppingCart = cart.get();

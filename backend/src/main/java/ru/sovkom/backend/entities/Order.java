@@ -31,6 +31,6 @@ public class Order {
     @JsonIgnore
     private Client client;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private Set<OrderDish> productsInOrder = new HashSet<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<OrderDish> dishesInOrder = new HashSet<>();
 }
