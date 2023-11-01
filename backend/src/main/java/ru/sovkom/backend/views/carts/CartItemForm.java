@@ -10,11 +10,9 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
-import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
 import ru.sovkom.backend.entities.Client;
 import ru.sovkom.backend.entities.Dish;
@@ -26,7 +24,9 @@ public class CartItemForm extends FormLayout {
 
     ComboBox<Dish> dishComboBox = new ComboBox<>("Выберите блюдо");
     ComboBox<Client> clientComboBox = new ComboBox<>("Выберите клиента");
-    IntegerField quantity = new IntegerField("Количество", String.valueOf(1));
+    IntegerField quantity = new IntegerField("Количество");
+
+
 
     Button save = new Button("Сохранить");
     Button delete = new Button("Удалить");
@@ -41,10 +41,8 @@ public class CartItemForm extends FormLayout {
         dishComboBox.setItems(dishes);
         dishComboBox.setItemLabelGenerator(Dish::getName);
 
-
         clientComboBox.setItems(clients);
         clientComboBox.setItemLabelGenerator(Client::getUsername);
-
 
         add(dishComboBox, clientComboBox, quantity, createButtonsLayout());
     }

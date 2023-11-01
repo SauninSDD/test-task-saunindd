@@ -116,7 +116,7 @@ public class ClientServiceImpl implements ClientService {
             log.info("Получаем корзину клиента с id {}", longIdClient);
             Optional<Cart> checkCart = cartRepository.findCartByClient_Id(longIdClient);
             if (checkCart.isPresent()) {
-                log.info("Id полученной корзины {}", checkCart.get().getId().getClass().getName());
+                log.info(" корзина {}", checkCart.get());
                 return cartItemRepository.findByCartId(checkCart.get().getId());
             }
             return cartItemRepository.findAll();

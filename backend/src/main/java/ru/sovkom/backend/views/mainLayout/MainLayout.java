@@ -52,8 +52,8 @@ public class MainLayout extends AppLayout {
         addToDrawer(new VerticalLayout(
                 new RouterLink("Клиенты", ListClientsView.class),
                 new RouterLink("Меню", ListDishesView.class),
-                new RouterLink("Заказы", ListOrdersView.class),
-                new RouterLink("Корзины", CartsView.class)
+                new RouterLink("Корзины", CartsView.class),
+                new RouterLink("Заказы", ListOrdersView.class)
         ));
     }
 }

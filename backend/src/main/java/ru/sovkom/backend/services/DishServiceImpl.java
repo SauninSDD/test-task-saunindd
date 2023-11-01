@@ -1,9 +1,11 @@
 package ru.sovkom.backend.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sovkom.backend.entities.Dish;
+import ru.sovkom.backend.repositories.ClientRepository;
 import ru.sovkom.backend.repositories.DishRepository;
 
 import java.util.List;
@@ -12,9 +14,12 @@ import java.util.List;
 @Service
 public class DishServiceImpl implements DishService{
     private final DishRepository dishRepository;
+    private final ClientRepository clientRepository;
 
-    public DishServiceImpl(DishRepository dishRepository) {
+
+    public DishServiceImpl(DishRepository dishRepository, ClientRepository clientRepository) {
         this.dishRepository = dishRepository;
+        this.clientRepository = clientRepository;
     }
 
 
@@ -51,12 +56,12 @@ public class DishServiceImpl implements DishService{
 
     @Override
     @Transactional
-    public boolean deleteDish(long id) {
-        log.info("Удаляет блюдо с id {}", id);
-
-        var isExistsDish = dishRepository.existsById(id);
-        if (isExistsDish) {
-            dishRepository.deleteById(id);
+    public boolean deleteDish(Dish dish) {
+        log.info("Удаляет блюдо  {}", dish);
+        long countClientsWithFavoriteDish = clientRepository.countClientsWithFavoriteDish(dish);
+        var isExistsDish = dishRepository.existsById(dish.getId());
+        if (isExistsDish && countClientsWithFavoriteDish == 0) {
+            dishRepository.deleteById(dish.getId());
             return true;
         }
 

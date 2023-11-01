@@ -47,7 +47,7 @@ public class Client {
     private String password;
 
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "clients_favorites",
             joinColumns = @JoinColumn(name = "id_client"),
             inverseJoinColumns = @JoinColumn(name = "id_dish"))

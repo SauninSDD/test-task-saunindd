@@ -2,6 +2,7 @@ package ru.sovkom.backend.services;
 
 import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
+import ru.sovkom.backend.entities.Dish;
 
 import java.util.List;
 
@@ -21,11 +22,10 @@ public interface CartService {
     /**
      * Удаление блюда из корзины
      *
-     * @param cartId   Уникальный идентификатор корзины
-     * @param dishId   Уникальный идентификатор блюда
+     * @param cart   Уникальный идентификатор  корзины
      * @return Возвращает статус удаления блюда из корзины
      */
-    boolean deleteDish(long cartId, long dishId);
+    boolean deleteDish(Cart cart, CartItem cartItem);
 
     /**
      * Удаляет все блюда из корзины по id клиента

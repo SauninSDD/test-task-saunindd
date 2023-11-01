@@ -12,6 +12,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.security.PermitAll;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import ru.sovkom.backend.entities.Dish;
 import ru.sovkom.backend.services.ClientService;
@@ -25,6 +26,7 @@ import java.util.List;
 @PageTitle("Dishes")
 @Route(value = "dishes", layout = MainLayout.class)
 @PermitAll
+@Slf4j
 public class ListDishesView extends VerticalLayout {
     Grid<Dish> grid = new Grid<>(Dish.class);
     TextField filterText = new TextField();
@@ -72,11 +74,10 @@ public class ListDishesView extends VerticalLayout {
     }
 
     private void deleteDish(DishForm.DeleteEvent event) {
-        List<Dish> dishList = dishService.getDishesByName(event.getDish().getName());
-        if (dishList.isEmpty()) {
-            Notification.show("Мы ведь не хотим обидеть клиента, поэтому давайте совершенно законно сначала удалим блюдо из его избранных :) . Мы понимаем, что это странное решение, но это необходимо для тестирования связи ManyToMany. Лааадно, мы попробуем, но в бд будет ошибка внешнего ключа, лучше создать новый продукт и попробовать его удалить");
+        log.info("Блюдо на удаление {}", event);
+        if (!dishService.deleteDish(event.getDish())) {
+            Notification.show("Мы ведь не хотим обидеть клиентов, поэтому давайте совершенно законно сначала удалим блюдо из их избранных :) . Мы понимаем, что это странное решение, но это необходимо для тестирования связи ManyToMany и кастомного запроса через query. Лааадно, мы попробуем, но в бд будет ошибка внешнего ключа, лучше создать новый продукт и попробовать его удалить");
         }
-       dishService.deleteDish(event.getDish().getId());
         updateList();
         closeDish();
     }

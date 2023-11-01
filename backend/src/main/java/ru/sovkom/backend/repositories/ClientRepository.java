@@ -1,8 +1,11 @@
 package ru.sovkom.backend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.sovkom.backend.entities.Client;
+import ru.sovkom.backend.entities.Dish;
 
 import java.util.Optional;
 import java.util.List;
@@ -41,6 +44,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     List<Client> findUsersByUsername(String name);
 
+    @Query("SELECT COUNT(c) FROM Client c JOIN c.dishesFavorites df WHERE :dish IN elements(df)")
+    long countClientsWithFavoriteDish(@Param("dish") Dish dish);
 
 
 

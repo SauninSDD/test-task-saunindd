@@ -35,12 +35,10 @@ public class ListOrdersView extends VerticalLayout {
 
     ClientService clientService;
 
-    DishService dishService;
 
-    public ListOrdersView(OrderService orderService, ClientService clientService, DishService dishService) {
+    public ListOrdersView(OrderService orderService, ClientService clientService) {
         this.orderService = orderService;
         this.clientService = clientService;
-        this.dishService = dishService;
         addClassName("list-view");
         setSizeFull();
         configureGrid();
@@ -61,7 +59,7 @@ public class ListOrdersView extends VerticalLayout {
     }
 
     private void configureForm() {
-        form = new OrderForm(clientService.getAllUsers(), dishService.getListDishes());
+        form = new OrderForm(clientService.getAllUsers());
         form.setWidth("25em");
         form.addSaveListener(this::saveOrder);
         form.addDeleteListener(this::deleteOrder);
@@ -85,13 +83,6 @@ public class ListOrdersView extends VerticalLayout {
         grid.setSizeFull();
         grid.setColumns("id", "orderTrackNumber");
         grid.addColumn(order -> order.getClient().getUsername()).setHeader("Client");
-        grid.addComponentColumn(order -> {
-            VerticalLayout layout = new VerticalLayout();
-            for (OrderDish orderDish : order.getDishesInOrder()) {
-                layout.add(new Span(orderDish.getDish().getName() + " (" + orderDish.getOrderDishValue() + ")"));
-            }
-            return layout;
-        }).setHeader("Dishes");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 
         grid.asSingleSelect().addValueChangeListener(event ->

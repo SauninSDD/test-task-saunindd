@@ -25,7 +25,6 @@ import ru.sovkom.backend.services.ClientService;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.ArrayList;
 
 @Slf4j
 public class ClientForm extends FormLayout {

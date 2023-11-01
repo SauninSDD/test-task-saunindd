@@ -1,7 +1,9 @@
 package ru.sovkom.backend.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.sovkom.backend.entities.*;
 import ru.sovkom.backend.repositories.CartItemRepository;
 import ru.sovkom.backend.repositories.CartRepository;
@@ -9,7 +11,7 @@ import ru.sovkom.backend.repositories.OrderRepository;
 
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -26,16 +28,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public boolean createOrder(Order order) {
         Optional<Cart> checkCartClient = cartRepository.findCartByClient_Id(order.getClient().getId());
-        Cart cartClient = checkCartClient.orElse(null);
-
         if (checkCartClient.isPresent()) {
+            Cart clientCart = checkCartClient.get();
+            log.info("Полученная корзина {}", clientCart.getCartItems());
 
-            List<CartItem> cartItems = cartItemRepository.findByCartId(cartClient.getId());
-            cartItemRepository.deleteAllByCart_Id(cartClient.getId());
-            for (CartItem cartItem : cartItems
-            ) {
+            for (CartItem cartItem : clientCart.getCartItems()) {
                 OrderDish orderDish = OrderDish.builder()
                         .order(order)
                         .dish(cartItem.getDish())
@@ -43,12 +43,16 @@ public class OrderServiceImpl implements OrderService {
                         .build();
                 order.getDishesInOrder().add(orderDish);
             }
+
             orderRepository.save(order);
+            clientCart.getCartItems().clear();
+            cartRepository.save(clientCart);
             return true;
         } else {
             return false;
         }
     }
+
 
     @Override
     public void deleteOrder(long id) {

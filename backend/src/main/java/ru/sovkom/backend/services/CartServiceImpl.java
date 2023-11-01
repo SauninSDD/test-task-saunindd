@@ -1,11 +1,11 @@
 package ru.sovkom.backend.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
-import ru.sovkom.backend.entities.Client;
 import ru.sovkom.backend.entities.Dish;
 import ru.sovkom.backend.exceptions.CartNotFoundException;
 import ru.sovkom.backend.exceptions.EmptyCartIdException;
@@ -20,17 +20,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    private final ClientRepository clientRepository;
     private final CartItemRepository cartItemRepository;
 
     private final DishRepository dishRepository;
 
     @Autowired
-    public CartServiceImpl(CartRepository cartRepository, ClientRepository clientRepository, CartItemRepository cartItemRepository, DishRepository dishRepository) {
+    public CartServiceImpl(CartRepository cartRepository, CartItemRepository cartItemRepository, DishRepository dishRepository) {
         this.cartRepository = cartRepository;
-        this.clientRepository = clientRepository;
         this.cartItemRepository = cartItemRepository;
         this.dishRepository = dishRepository;
     }
@@ -67,8 +66,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public boolean deleteDish(long cartId, long dishId) {
-        cartItemRepository.deleteCartItemByCartIdAndDishId(cartId, dishId);
+    public boolean deleteDish(Cart cart, CartItem cartItem) {
+        log.info("Сервер: Удаление блюда {} из корзины {} ", cartItem, cart);
+        cart.getCartItems().remove(cartItem);
+        cartRepository.save(cart);
         return true;
     }
 
@@ -102,7 +103,6 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void deleteCart(long clientId) {
         Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
-
         if (cart.isPresent()) {
             long cartId = cart.get().getId();
             cartRepository.deleteById(cartId);
@@ -150,10 +150,8 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getCartIdByClientId(long clientId) {
-
             Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
             return cart.orElseThrow(() -> new CartNotFoundException("Cart not found for client ID: " + clientId));
-
     }
 
 

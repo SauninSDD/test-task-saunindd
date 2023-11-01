@@ -3,6 +3,7 @@ package ru.sovkom.backend.views.carts;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -14,7 +15,9 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
+import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
+import ru.sovkom.backend.entities.Dish;
 import ru.sovkom.backend.services.CartService;
 import ru.sovkom.backend.services.ClientService;
 import ru.sovkom.backend.services.DishService;
@@ -25,6 +28,7 @@ import ru.sovkom.backend.views.mainLayout.MainLayout;
 @PageTitle("Cart")
 @Route(value = "cart", layout = MainLayout.class)
 @PermitAll
+@Slf4j
 public class CartsView extends VerticalLayout {
     Grid<CartItem> grid = new Grid<>(CartItem.class);
     TextField clientId = new TextField("Id клиента");
@@ -38,6 +42,7 @@ public class CartsView extends VerticalLayout {
 
     DishService dishService;
 
+
     public CartsView(CartService cartService, ClientService clientService, DishService dishService) {
         this.cartService = cartService;
         this.clientService = clientService;
@@ -46,7 +51,6 @@ public class CartsView extends VerticalLayout {
         setSizeFull();
         configureGrid();
         configureForm();
-
         add(getToolbar(), getContent());
         updateList();
         closeCart();
@@ -84,10 +88,18 @@ public class CartsView extends VerticalLayout {
 
 
     private void deleteCartItem(CartItemForm.DeleteEventItem event) {
-        long cartId = cartService.getCartIdByClientId(form.clientComboBox.getValue().getId()).getId();
-        cartService.deleteDish(cartId, event.getCartItem().getDish().getId());
-        updateList();
-        closeCart();
+        log.info("Что лежит в ивенте {}", event.getCartItem());
+        if (event.getCartItem() != null) {
+            Cart cart = event.getCartItem().getCart();
+            CartItem cartItem = event.getCartItem();
+            log.info("Началось удаление элемента корзины {}", cart );
+            cartService.deleteDish(cart, cartItem);
+            updateList();
+            closeCart();
+        } else {
+            Notification.show("Чтобы что-то удалить, сначала нужно это создать (с) цитатная цитата");
+        }
+
     }
 
     private void configureGrid() {
@@ -97,6 +109,7 @@ public class CartsView extends VerticalLayout {
         grid.addColumn(cartItem -> cartItem.getDish().getName()).setHeader("Dish");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
         grid.addColumn(cartItem -> cartItem.getCart().getClient().getId()).setHeader("Id клиента");
+        grid.addColumn(cartItem -> cartItem.getCart().getClient().getUsername()).setHeader("Имя клиента");
 
         grid.asSingleSelect().addValueChangeListener(event ->
                 editCartItem(event.getValue()));
@@ -121,22 +134,27 @@ public class CartsView extends VerticalLayout {
         if (cartItem == null) {
             closeCart();
         } else {
-            /*form.dishComboBox.setValue(cartItem.getDish());
-            form.clientComboBox.setValue(cartItem.getCart().getClient());*/
             form.setCartItem(cartItem);
             form.setVisible(true);
             addClassName("editing");
+
+            if (cartItem.getCart() != null && cartItem.getDish() != null) {
+                form.clientComboBox.setValue(cartItem.getCart().getClient());
+                form.dishComboBox.setValue(cartItem.getDish());
+            }
         }
     }
 
+
     private void closeCart() {
         form.setCartItem(null);
-               form.setVisible(false);
+        form.setVisible(false);
         removeClassName("editing");
     }
 
     private void addCartItem() {
-
+        form.clientComboBox.setValue(null);
+        form.dishComboBox.setValue(null);
         grid.asSingleSelect().clear();
         editCartItem(new CartItem());
     }

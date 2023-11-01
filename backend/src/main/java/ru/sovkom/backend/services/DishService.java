@@ -32,10 +32,10 @@ public interface DishService  {
     /**
      * Удаляет блюдо
      *
-     * @param id id блюда
+     * @param dish  блюдо
      * @return boolean
      */
-    boolean deleteDish(long id);
+    boolean deleteDish(Dish dish);
 
     List<Dish> getDishesByName(String name);
 }
