@@ -1,6 +1,7 @@
-package ru.sovkom.backend.views.clients;
+package ru.sovkom.backend.views.favorites;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -13,23 +14,22 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Scope;
 import ru.sovkom.backend.entities.Client;
 import ru.sovkom.backend.services.ClientService;
-import com.vaadin.flow.component.button.Button;
 import ru.sovkom.backend.views.mainLayout.MainLayout;
 
 @SpringComponent
 @Scope("prototype")
 @PermitAll
-@Route(value = "", layout = MainLayout.class)
-@PageTitle("Users")
-public class ListClientsView extends VerticalLayout {
+@Route(value = "favorites", layout = MainLayout.class)
+@PageTitle("Favorites")
+public class FavoritesDishesView extends VerticalLayout {
     Grid<Client> grid = new Grid<>(Client.class);
     TextField filterText = new TextField();
 
-    ClientForm form;
+    FavoriteForm form;
 
     ClientService clientService;
 
-    public ListClientsView(ClientService clientService) {
+    public FavoritesDishesView(ClientService clientService) {
         this.clientService = clientService;
         addClassName("list-view");
         setSizeFull();
@@ -51,20 +51,20 @@ public class ListClientsView extends VerticalLayout {
     }
 
     private void configureForm() {
-        form = new ClientForm(clientService);
+        form = new FavoriteForm();
         form.setWidth("25em");
-        form.addSaveListener(this::saveContact);
-        form.addDeleteListener(this::deleteContact);
+        form.addSaveListener(this::addFavorite);
+        form.addDeleteListener(this::deleteFavorite);
         form.addCloseListener(e -> closeClient());
     }
 
-    private void saveContact(ClientForm.SaveEvent event) {
+    private void addFavorite(FavoriteForm.SaveEvent event) {
         clientService.saveClient(event.getClient());
         updateList();
         closeClient();
     }
 
-    private void deleteContact(ClientForm.DeleteEvent event) {
+    private void deleteFavorite(FavoriteForm.DeleteEvent event) {
         clientService.deleteClientById(event.getClient().getId());
         updateList();
         closeClient();
@@ -73,7 +73,7 @@ public class ListClientsView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassNames("client-grid");
         grid.setSizeFull();
-        grid.setColumns("id","username", "number", "email", "password");
+        grid.setColumns("id","username", "number");
 
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
 

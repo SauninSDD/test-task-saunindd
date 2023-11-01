@@ -29,7 +29,7 @@ public class Client {
     private long id;
 
     @Size(max = 100)
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Size(max = 100)

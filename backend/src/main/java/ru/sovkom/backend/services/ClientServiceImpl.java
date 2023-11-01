@@ -8,13 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
 import ru.sovkom.backend.entities.Client;
+import ru.sovkom.backend.entities.Dish;
 import ru.sovkom.backend.repositories.CartItemRepository;
 import ru.sovkom.backend.repositories.CartRepository;
 import ru.sovkom.backend.repositories.ClientRepository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -122,5 +122,14 @@ public class ClientServiceImpl implements ClientService {
             return cartItemRepository.findAll();
         }
     }
+
+    public void addDishToFavorites(Client client, Dish dish) {
+        log.info("Добавление избранных блюд вызвалось");
+        client.getDishesFavorites().add(dish);
+        clientRepository.save(client);
+    }
+
+
+
 
 }

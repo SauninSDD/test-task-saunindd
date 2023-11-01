@@ -1,12 +1,13 @@
 package ru.sovkom.backend.services;
 
-import ru.sovkom.backend.entities.Cart;
 import ru.sovkom.backend.entities.CartItem;
 import ru.sovkom.backend.entities.Client;
+import ru.sovkom.backend.entities.Dish;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Сервис для взаимодействия с пользователем
@@ -67,4 +68,9 @@ public interface ClientService {
     List<Client> getAllUsers();
 
     List<CartItem> getClientCart(String clientId);
+
+    void addDishToFavorites(Client client, Dish dish);
+
+
+
 }

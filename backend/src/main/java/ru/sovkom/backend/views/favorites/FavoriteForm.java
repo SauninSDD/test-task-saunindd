@@ -1,4 +1,4 @@
-package ru.sovkom.backend.views.dishes;
+package ru.sovkom.backend.views.favorites;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
@@ -6,56 +6,41 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 import ru.sovkom.backend.entities.Client;
-import ru.sovkom.backend.entities.Dish;
-import ru.sovkom.backend.services.ClientService;
 
-import java.util.List;
-
-public class DishForm extends FormLayout {
-    TextField name = new TextField("Название");
-    NumberField price = new NumberField("Стоимость");
+public class FavoriteForm extends FormLayout {
+    TextField nameDish = new TextField("Название блюда");
+    TextField idClient = new TextField("Id клиента");
 
     Button save = new Button("Сохранить");
     Button delete = new Button("Удалить");
     Button close = new Button("Закрыть");
-    Binder<Dish> binder = new BeanValidationBinder<>(Dish.class);
+    Binder<Client> binder = new BeanValidationBinder<>(Client.class);
 
-    ClientService clientService;
-
-    ComboBox<Client> clientComboBox = new ComboBox<>("Клиент");
-    public DishForm(List<Client> clientList, ClientService clientService) {
-        this.clientService = clientService;
-        addClassName("dish-form");
+    public FavoriteForm() {
+        addClassName("user-form");
         binder.bindInstanceFields(this);
-        clientComboBox.setItems(clientList);
-        clientComboBox.setItemLabelGenerator(Client::getUsername);
-        Button buttonAddFavorite = new Button("Добавить блюдо в избранное", e -> addFavorites());
-        add(name,
-                price,
-                createButtonsLayout(),
-                clientComboBox,
-                buttonAddFavorite);
-    }
 
+
+        add(nameDish,
+                idClient,
+                createButtonsLayout());
+    }
 
     private Component createButtonsLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-
         save.addClickShortcut(Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);
-
         save.addClickListener(event -> validateAndSave());
         delete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
         close.addClickListener(event -> fireEvent(new CloseEvent(this)));
@@ -63,49 +48,45 @@ public class DishForm extends FormLayout {
         return new HorizontalLayout(save, delete, close);
     }
 
-    private void addFavorites(){
-        clientService.addDishToFavorites(clientComboBox.getValue(), binder.getBean());
-        Notification.show("Добавлено в избранное клиента " + clientComboBox.getValue().getUsername());
-    }
     private void validateAndSave() {
-        if (binder.isValid()) {
+        if(binder.isValid()) {
             fireEvent(new SaveEvent(this, binder.getBean()));
         }
     }
 
 
-    public void setDish(Dish dish) {
-        binder.setBean(dish);
+    public void setClient(Client client) {
+        binder.setBean(client);
     }
 
-    public static abstract class DishFormEvent extends ComponentEvent<DishForm> {
-        private final Dish dish;
+    public static abstract class FavoriteFormEvent extends ComponentEvent<FavoriteForm> {
+        private final Client client;
 
-        protected DishFormEvent(DishForm source, Dish dish) {
+        protected FavoriteFormEvent(FavoriteForm source, Client client) {
             super(source, false);
-            this.dish = dish;
+            this.client = client;
         }
 
-        public Dish getDish() {
-            return dish;
-        }
-    }
-
-    public static class SaveEvent extends DishFormEvent {
-        SaveEvent(DishForm source, Dish dish) {
-            super(source, dish);
+        public Client getClient() {
+            return client;
         }
     }
 
-    public static class DeleteEvent extends DishFormEvent {
-        DeleteEvent(DishForm source, Dish dish) {
-            super(source, dish);
+    public static class SaveEvent extends FavoriteFormEvent {
+        SaveEvent(FavoriteForm source, Client client) {
+            super(source, client);
+        }
+    }
+
+    public static class DeleteEvent extends FavoriteFormEvent {
+        DeleteEvent(FavoriteForm source, Client client) {
+            super(source, client);
         }
 
     }
 
-    public static class CloseEvent extends DishFormEvent {
-        CloseEvent(DishForm source) {
+    public static class CloseEvent extends FavoriteFormEvent {
+        CloseEvent(FavoriteForm source) {
             super(source, null);
         }
     }
@@ -117,7 +98,6 @@ public class DishForm extends FormLayout {
     public Registration addSaveListener(ComponentEventListener<SaveEvent> listener) {
         return addListener(SaveEvent.class, listener);
     }
-
     public Registration addCloseListener(ComponentEventListener<CloseEvent> listener) {
         return addListener(CloseEvent.class, listener);
     }
