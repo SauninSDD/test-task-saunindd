@@ -19,20 +19,17 @@ import ru.sovkom.backend.entities.Dish;
 
 import java.util.List;
 
-
+/**
+ * Форма для редактирования элементов корзины.
+ */
 public class CartItemForm extends FormLayout {
-
     ComboBox<Dish> dishComboBox = new ComboBox<>("Выберите блюдо");
     ComboBox<Client> clientComboBox = new ComboBox<>("Выберите клиента");
     IntegerField quantity = new IntegerField("Количество");
-
-
-
     Button save = new Button("Сохранить");
     Button delete = new Button("Удалить");
     Button close = new Button("Закрыть");
     Binder<CartItem> binder = new BeanValidationBinder<>(CartItem.class);
-
 
     public CartItemForm(List<Dish> dishes, List<Client> clients) {
         addClassName("cart-form");

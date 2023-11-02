@@ -4,38 +4,39 @@ import ru.sovkom.backend.entities.Dish;
 
 import java.util.List;
 
+/**
+ * Сервис для работы с блюдами.
+ */
 public interface DishService  {
 
     /**
-     * Добавляет блюдо
+     * Добавляет блюдо в базу данных.
      *
-     * @param dish блюдо
-     * @return boolean
+     * @param dish Блюдо для добавления.
+     * @return Уникальный идентификатор добавленного блюда.
      */
     long addDish(Dish dish);
 
     /**
-     * Получает все блюда
+     * Получает список всех блюд.
      *
-     * @return List<Dish>
+     * @return Список блюд.
      */
     List<Dish> getListDishes();
 
     /**
-     * Обновляет блюдо
+     * Удаляет блюдо из базы данных.
      *
-     * @param dish блюдо
-     * @return boolean
-     */
-    boolean updateDish(Dish dish);
-
-    /**
-     * Удаляет блюдо
-     *
-     * @param dish  блюдо
-     * @return boolean
+     * @param dish Блюдо для удаления.
+     * @return `true`, если блюдо успешно удалено, иначе `false`.
      */
     boolean deleteDish(Dish dish);
 
+    /**
+     * Получает список блюд по имени.
+     *
+     * @param name Название блюда или его часть.
+     * @return Список блюд, удовлетворяющих критерию поиска.
+     */
     List<Dish> getDishesByName(String name);
 }

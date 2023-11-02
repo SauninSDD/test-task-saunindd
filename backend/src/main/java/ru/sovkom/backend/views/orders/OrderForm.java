@@ -8,29 +8,33 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 import ru.sovkom.backend.entities.Client;
-import ru.sovkom.backend.entities.Dish;
 import ru.sovkom.backend.entities.Order;
+import ru.sovkom.backend.entities.OrderDish;
 
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * Форма для создания, редактирования заказа.
+ */
 public class OrderForm extends FormLayout {
     TextField orderTrackNumber = new TextField("Трек-номер заказа");
     ComboBox<Client> client = new ComboBox<>("Клиент");
-
     Button save = new Button("Сохранить");
     Button delete = new Button("Удалить");
     Button close = new Button("Закрыть");
 
     Binder<Order> binder = new BeanValidationBinder<>(Order.class);
+    private final Grid<OrderDish> dishesGrid = new Grid<>(OrderDish.class);
 
-    Button viewDishesInOrderButton = new Button("Посмотреть блюда в заказе");
     public OrderForm(List<Client> clients) {
         addClassName("order-form");
         binder.bindInstanceFields(this);
@@ -38,13 +42,23 @@ public class OrderForm extends FormLayout {
         client.setItems(clients);
         client.setItemLabelGenerator(Client::getUsername);
 
+        H4 labelDishOrder = new H4("Блюда в заказе");
+        labelDishOrder.getStyle().set("text-align", "center");
 
+        dishesGrid.setColumns("dish.name", "dish.price", "orderDishValue");
+        dishesGrid.getColumnByKey("dish.name").setHeader("Название");
+        dishesGrid.getColumnByKey("dish.price").setHeader("Цена");
+        dishesGrid.getColumnByKey("orderDishValue").setHeader("Кол-во");
+
+
+        dishesGrid.getColumns().forEach(col -> col.setAutoWidth(true));
+
+        add(orderTrackNumber, client, createButtonsLayout(), labelDishOrder, dishesGrid);
         add(orderTrackNumber,
                 client,
-                createButtonsLayout(),
-                viewDishesInOrderButton);
+                createButtonsLayout()
+        );
     }
-
 
     private Component createButtonsLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -61,16 +75,25 @@ public class OrderForm extends FormLayout {
         return new HorizontalLayout(save, delete, close);
     }
 
-
     private void validateAndSave() {
         if (binder.isValid()) {
             fireEvent(new SaveEvent(this, binder.getBean()));
         }
     }
 
-
     public void setOrder(Order order) {
-        binder.setBean(order);
+        binder.setBean(Objects.requireNonNullElseGet(order, Order::new));
+        updateDishesInOrder();
+    }
+
+    private void updateDishesInOrder() {
+        Order order = binder.getBean();
+        if (order != null) {
+            List<OrderDish> orderDishes = order.getDishesInOrder();
+            dishesGrid.setItems(orderDishes);
+        } else {
+            dishesGrid.setItems();
+        }
     }
 
     public static abstract class OrderFormEvent extends ComponentEvent<OrderForm> {
@@ -85,6 +108,7 @@ public class OrderForm extends FormLayout {
             return order;
         }
     }
+
 
     public static class SaveEvent extends OrderFormEvent {
         SaveEvent(OrderForm source, Order order) {

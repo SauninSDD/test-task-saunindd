@@ -3,7 +3,6 @@ package ru.sovkom.backend.views.orders;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -14,12 +13,13 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Scope;
 import ru.sovkom.backend.entities.Order;
-import ru.sovkom.backend.entities.OrderDish;
 import ru.sovkom.backend.services.ClientService;
-import ru.sovkom.backend.services.DishService;
 import ru.sovkom.backend.services.OrderService;
 import ru.sovkom.backend.views.mainLayout.MainLayout;
 
+/**
+ * Представление списка заказов пользователей.
+ */
 @SpringComponent
 @Scope("prototype")
 @PageTitle("Orders")
@@ -28,13 +28,9 @@ import ru.sovkom.backend.views.mainLayout.MainLayout;
 public class ListOrdersView extends VerticalLayout {
     Grid<Order> grid = new Grid<>(Order.class);
     TextField filterText = new TextField();
-
     OrderForm form;
-
     OrderService orderService;
-
     ClientService clientService;
-
 
     public ListOrdersView(OrderService orderService, ClientService clientService) {
         this.orderService = orderService;
@@ -81,10 +77,11 @@ public class ListOrdersView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassNames("order-grid");
         grid.setSizeFull();
-        grid.setColumns("id", "orderTrackNumber");
-        grid.addColumn(order -> order.getClient().getUsername()).setHeader("Client");
+        grid.setColumns("id", "orderTrackNumber", "client.username");
+        grid.getColumnByKey("id").setHeader("ID Заказа");
+        grid.getColumnByKey("orderTrackNumber").setHeader("Трек-номер");
+        grid.getColumnByKey("client.username").setHeader("Имя Клиента");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
-
         grid.asSingleSelect().addValueChangeListener(event ->
                 editOrder(event.getValue()));
     }
@@ -95,10 +92,8 @@ public class ListOrdersView extends VerticalLayout {
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
-
         Button addOrderButton = new Button("Создать заказ");
         addOrderButton.addClickListener(click -> addOrder());
-
         var toolbar = new HorizontalLayout(filterText, addOrderButton);
         toolbar.addClassName("toolbar");
         return toolbar;

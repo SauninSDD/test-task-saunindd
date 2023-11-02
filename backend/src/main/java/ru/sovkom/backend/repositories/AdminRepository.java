@@ -6,15 +6,18 @@ import ru.sovkom.backend.entities.Admin;
 
 import java.util.Optional;
 
+/**
+ * Репозиторий для работы с администраторами.
+ */
 @Repository
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     /**
-     * Ищет админа по email и паролю
+     * Поиск админа по указанной электронной почте и паролю.
      *
-     * @param email электронная почта клиента
-     * @param password пароль клиента
-     * @return пользователя
+     * @param email    Электронная почта админа.
+     * @param password Пароль админа.
+     * @return Объект Optional, содержащий найденного админа, если такой админ существует.
      */
     Optional<Admin> findAdminByEmailAndPassword(String email, String password);
 }

@@ -8,6 +8,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.sovkom.backend.views.authorization.LoginView;
 
+/**
+ * Конфигурация безопасности для приложения.
+ */
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
@@ -18,11 +21,18 @@ public class SecurityConfig extends VaadinWebSecurity {
         this.adminAuthenticationProvider = adminAuthenticationProvider;
     }
 
+    /**
+     * Настройка безопасности HTTP-запросов.
+     *
+     * @param http Конфигурация безопасности HTTP-запросов.
+     * @throws Exception Исключение, если настройка не может быть выполнена.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth ->
                 auth.requestMatchers(
                         AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/images/*.png")).permitAll());
+
         http.authenticationProvider(adminAuthenticationProvider);
         super.configure(http);
         setLoginView(http, LoginView.class);

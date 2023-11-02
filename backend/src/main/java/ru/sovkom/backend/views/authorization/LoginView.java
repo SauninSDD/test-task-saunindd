@@ -8,6 +8,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+/**
+ * Представление для входа в систему.
+ */
 @Route("login")
 @PageTitle("login")
 @AnonymousAllowed
@@ -21,12 +24,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
         login.setAction("login");
-
-
         add(new H1("Тестовое задание"), login, new H2("Нет аккаунта?"), new Button("Зарегистрируйтесь", e -> getUI().ifPresent(ui -> ui.navigate("register")))
-
-);
-
+        );
     }
 
     @Override

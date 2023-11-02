@@ -4,32 +4,21 @@ import ru.sovkom.backend.entities.CartItem;
 import ru.sovkom.backend.entities.Client;
 import ru.sovkom.backend.entities.Dish;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 /**
- * Сервис для взаимодействия с пользователем
+ * Сервис для взаимодействия с пользователем.
  */
 public interface ClientService {
     /**
-     * Регистрирует пользователя
+     * Регистрирует пользователя.
      *
      * @param client Данные о пользователе
      */
     void saveClient(Client client);
 
     /**
-     * Производит поиск пользователя по id
-     *
-     * @param clientId Уникальный идентификатор пользователя
-     * @return Возвращает найденного пользователя
-     */
-    Optional<Client> getClientById(long clientId);
-
-    /**
-     * Проверяет существует ли пользователь
+     * Проверяет существует ли пользователь.
      *
      * @param clientId Уникальный идентификатор пользователя
      * @return Возвращает результат проверки
@@ -37,40 +26,42 @@ public interface ClientService {
     boolean checkClientExistence(long clientId);
 
     /**
-     * Удаляет пользователя по id
+     * Удаляет пользователя по ID.
      *
      * @param clientId Уникальный идентификатор пользователя
-     * @return true при удачном удалении и false, если пользователя не существует
+     * @return `true` при успешном удалении и `false`, если пользователя не существует
      */
     boolean deleteClientById(long clientId);
 
     /**
-     * Получает клиента по его email
+     * Получает список пользователей по имени.
      *
-     * @param email электронная почта клиента
-     * @return клиента по email
+     * @param name Имя пользователя
+     * @return Список пользователей с указанным именем
      */
-    Optional<Client> getClientByEmail(String email);
-
-    /**
-     * Обновялет информацию о клиенте
-     *
-     * @param clientId id клиента
-     * @param name имя клиента
-     * @param dateOfBirth дата рождения клиента
-     * @param number номер телефона клиента
-     * @return true, если информация о клиенте успешно обновлена
-     */
-    boolean updateClientInfo(long clientId, String name, Date dateOfBirth, String number);
-
     List<Client> getUsersByUsername(String name);
 
+    /**
+     * Получает список всех пользователей.
+     *
+     * @return Список всех пользователей
+     */
     List<Client> getAllUsers();
 
+    /**
+     * Получает корзину пользователя.
+     *
+     * @param clientId Уникальный идентификатор пользователя
+     * @return Список элементов корзины пользователя
+     */
     List<CartItem> getClientCart(String clientId);
 
-    void addDishToFavorites(Client client, Dish dish);
-
-
-
+    /**
+     * Добавляет блюдо в избранное пользователя.
+     *
+     * @param client Пользователь
+     * @param dish   Блюдо для добавления в избранное
+     * @return `true`, если блюдо успешно добавлено в избранное, иначе `false`
+     */
+    boolean addDishToFavorites(Client client, Dish dish);
 }

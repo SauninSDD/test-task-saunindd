@@ -21,7 +21,11 @@ import ru.sovkom.backend.services.ClientService;
 
 import java.util.List;
 
+/**
+ * Форма для создания, редактирования блюд.
+ */
 public class DishForm extends FormLayout {
+
     TextField name = new TextField("Название");
     NumberField price = new NumberField("Стоимость");
 
@@ -39,14 +43,20 @@ public class DishForm extends FormLayout {
         binder.bindInstanceFields(this);
         clientComboBox.setItems(clientList);
         clientComboBox.setItemLabelGenerator(Client::getUsername);
-        Button buttonAddFavorite = new Button("Добавить блюдо в избранное", e -> addFavorites());
+
+        Button buttonAddFavorite = new Button("Добавить блюдо в избранное", e -> {
+            addFavorites();
+            clientComboBox.clear();
+
+            fireEvent(new CloseEvent(this));
+        });
+
         add(name,
                 price,
                 createButtonsLayout(),
                 clientComboBox,
                 buttonAddFavorite);
     }
-
 
     private Component createButtonsLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -63,10 +73,16 @@ public class DishForm extends FormLayout {
         return new HorizontalLayout(save, delete, close);
     }
 
-    private void addFavorites(){
-        clientService.addDishToFavorites(clientComboBox.getValue(), binder.getBean());
-        Notification.show("Добавлено в избранное клиента " + clientComboBox.getValue().getUsername());
+    private void addFavorites() {
+        boolean addedToFavorites = clientService.addDishToFavorites(clientComboBox.getValue(), binder.getBean());
+
+        if (addedToFavorites) {
+            Notification.show("Добавлено в избранное клиента " + clientComboBox.getValue().getUsername());
+        } else {
+            Notification.show("Блюдо уже было добавлено в избранное");
+        }
     }
+
     private void validateAndSave() {
         if (binder.isValid()) {
             fireEvent(new SaveEvent(this, binder.getBean()));
@@ -104,6 +120,7 @@ public class DishForm extends FormLayout {
 
     }
 
+
     public static class CloseEvent extends DishFormEvent {
         CloseEvent(DishForm source) {
             super(source, null);
@@ -121,6 +138,4 @@ public class DishForm extends FormLayout {
     public Registration addCloseListener(ComponentEventListener<CloseEvent> listener) {
         return addListener(CloseEvent.class, listener);
     }
-
-
 }

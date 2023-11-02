@@ -15,6 +15,9 @@ import ru.sovkom.backend.views.dishes.ListDishesView;
 import ru.sovkom.backend.views.clients.ListClientsView;
 import ru.sovkom.backend.views.orders.ListOrdersView;
 
+/**
+ * Представление главного макета приложения
+ */
 public class MainLayout extends AppLayout {
 
     private final SecurityService securityService;
@@ -30,23 +33,18 @@ public class MainLayout extends AppLayout {
         logo.addClassNames(
                 LumoUtility.FontSize.LARGE,
                 LumoUtility.Margin.MEDIUM);
-
-            String u = securityService.getAuthenticatedUser().getUsername();
+        String u = securityService.getAuthenticatedUser().getUsername();
         Button logout = new Button("Выйти из профиля " + u, e -> securityService.logout());
         logout.getStyle().set("color", "red");
-
         var header = new HorizontalLayout(new DrawerToggle(), logo, logout);
-
         header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         header.expand(logo);
         header.setWidthFull();
         header.addClassNames(
                 LumoUtility.Padding.Vertical.NONE,
                 LumoUtility.Padding.Horizontal.MEDIUM);
-
         addToNavbar(header);
     }
-
 
     private void createDrawer() {
         addToDrawer(new VerticalLayout(

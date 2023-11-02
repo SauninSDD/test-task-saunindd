@@ -26,18 +26,18 @@ import ru.sovkom.backend.services.ClientService;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Форма для создания и редактирования клиента.
+ */
 @Slf4j
 public class ClientForm extends FormLayout {
     TextField userName = new TextField("Имя клиента");
     TextField number = new TextField("Номер телефона");
     EmailField email = new EmailField("Email");
     PasswordField password = new PasswordField("Пароль");
-
-
     Button save = new Button("Сохранить");
     Button delete = new Button("Удалить");
     Button close = new Button("Закрыть");
-
     Button viewFavoritesButton = new Button("Посмотреть избранные блюда");
     Binder<Client> binder = new BeanValidationBinder<>(Client.class);
 
@@ -47,9 +47,7 @@ public class ClientForm extends FormLayout {
         this.clientService = clientService;
         addClassName("user-form");
         binder.bindInstanceFields(this);
-
         viewFavoritesButton.addClickListener(event -> createFavoritesDialog(binder.getBean()));
-
         add(userName,
                 number,
                 email,
@@ -67,7 +65,6 @@ public class ClientForm extends FormLayout {
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.add(favoriteList);
-
         Button deleteSelectedDish = new Button("Удалить");
         deleteSelectedDish.addClickListener(e -> {
             Set<Dish> selectedDish = new HashSet<>(favoriteList.getSelectedItems());
@@ -80,12 +77,10 @@ public class ClientForm extends FormLayout {
         dialog.open();
     }
 
-
     private void deleteFavoriteDishes(Set<Dish> selectedDish, Client client) {
         log.info("Список избранных на удаление {}", selectedDish);
         client.getDishesFavorites().removeAll(selectedDish);
         log.info("Список избранного после удаления {}", client.getDishesFavorites());
-
         clientService.saveClient(client);
     }
 
@@ -93,14 +88,11 @@ public class ClientForm extends FormLayout {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-
         save.addClickShortcut(Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);
-
         save.addClickListener(event -> validateAndSave());
         delete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
         close.addClickListener(event -> fireEvent(new CloseEvent(this)));
-
         binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         return new HorizontalLayout(save, delete, close);
     }
@@ -110,7 +102,6 @@ public class ClientForm extends FormLayout {
             fireEvent(new SaveEvent(this, binder.getBean()));
         }
     }
-
 
     public void setClient(Client client) {
         binder.setBean(client);
@@ -139,7 +130,6 @@ public class ClientForm extends FormLayout {
         DeleteEvent(ClientForm source, Client client) {
             super(source, client);
         }
-
     }
 
     public static class CloseEvent extends ClientFormEvent {

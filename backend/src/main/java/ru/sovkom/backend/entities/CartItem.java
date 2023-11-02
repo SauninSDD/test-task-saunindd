@@ -10,7 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 /**
- * Сущность содержимого корзины
+ * Сущность элемента корзины.
  */
 @Data
 @Builder
@@ -19,24 +19,37 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItem {
+    /**
+     * Уникальный идентификатор элемента корзины.
+     */
     @Id
     @Column(name = "id_cartItem")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Связь с корзиной, к которой принадлежит элемент.
+     */
     @ManyToOne
     @JoinColumn(name = "id_cart", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Cart cart;
 
+    /**
+     * Связь с блюдом, которое представляет данный элемент корзины.
+     */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_dish")
     private Dish dish;
 
+    /**
+     * Количество данного блюда в корзине.
+     */
     @Column(nullable = false)
     private int quantity;
+
 
     @Override
     public String toString() {

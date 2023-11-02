@@ -19,8 +19,9 @@ import ru.sovkom.backend.services.ClientService;
 import ru.sovkom.backend.services.DishService;
 import ru.sovkom.backend.views.mainLayout.MainLayout;
 
-import java.util.List;
-
+/**
+ * Представление для меню.
+ */
 @SpringComponent
 @Scope("prototype")
 @PageTitle("Dishes")
@@ -68,9 +69,20 @@ public class ListDishesView extends VerticalLayout {
     }
 
     private void saveDish(DishForm.SaveEvent event) {
-        dishService.addDish(event.getDish());
-        updateList();
-        closeDish();
+        Dish dishToSave = event.getDish();
+
+        if (isDishFieldsValid(dishToSave)) {
+            dishService.addDish(dishToSave);
+            updateList();
+            closeDish();
+        } else {
+            Notification.show("Заполните все поля");
+        }
+    }
+
+    private boolean isDishFieldsValid(Dish dish) {
+        return dish.getName() != null && !dish.getName().isEmpty() &&
+                dish.getPrice() != null;
     }
 
     private void deleteDish(DishForm.DeleteEvent event) {
@@ -86,8 +98,10 @@ public class ListDishesView extends VerticalLayout {
         grid.addClassNames("dish-grid");
         grid.setSizeFull();
         grid.setColumns("id", "name", "price");
+        grid.getColumnByKey("id").setHeader("ID Блюда");
+        grid.getColumnByKey("name").setHeader("Название");
+        grid.getColumnByKey("price").setHeader("Стоимость");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
-
         grid.asSingleSelect().addValueChangeListener(event ->
                 editDish(event.getValue()));
     }
@@ -98,6 +112,7 @@ public class ListDishesView extends VerticalLayout {
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
+
 
         Button addDishButton = new Button("Добавить блюдо");
         addDishButton.addClickListener(click -> addDish());
@@ -117,7 +132,7 @@ public class ListDishesView extends VerticalLayout {
         }
     }
 
-    private void closeDish() {
+    public void closeDish() {
         form.setDish(null);
         form.setVisible(false);
         removeClassName("editing");

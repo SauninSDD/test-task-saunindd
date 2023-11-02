@@ -11,6 +11,9 @@ import ru.sovkom.backend.services.AdminService;
 
 import java.util.Optional;
 
+/**
+ * Реализация провайдера аутентификации для администраторов.
+ */
 @Component
 public class AdminAuthenticationProvider implements AuthenticationProvider {
 
@@ -28,11 +31,10 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 
         Optional<Admin> admin = adminService.getAdminByEmailAndPassword(username, password);
 
-        if (admin.isPresent()) {
-            if (admin.get().getPassword().equals(password)) {
+        if (admin.isPresent() && (admin.get().getPassword().equals(password))) {
                 AdminDetails adminDetails = new AdminDetails(admin.get());
                 return new UsernamePasswordAuthenticationToken(adminDetails, password, adminDetails.getAuthorities());
-            }
+
         }
 
         return null;

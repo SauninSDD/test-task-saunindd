@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sovkom.backend.entities.*;
-import ru.sovkom.backend.repositories.CartItemRepository;
 import ru.sovkom.backend.repositories.CartRepository;
 import ru.sovkom.backend.repositories.OrderRepository;
 
@@ -16,26 +15,32 @@ import java.util.Optional;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-    private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
 
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, CartItemRepository cartItemRepository, CartRepository cartRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, CartRepository cartRepository) {
         this.orderRepository = orderRepository;
-        this.cartItemRepository = cartItemRepository;
         this.cartRepository = cartRepository;
     }
 
     @Override
     @Transactional
-    public boolean createOrder(Order order) {
+    public void createOrder(Order order) {
+        if (order.getClient() == null) {
+            log.warn("Пользователь не найден");
+            return;
+        }
+
         Optional<Cart> checkCartClient = cartRepository.findCartByClient_Id(order.getClient().getId());
         if (checkCartClient.isPresent()) {
             Cart clientCart = checkCartClient.get();
-            log.info("Полученная корзина {}", clientCart.getCartItems());
+            Client clientOrder = clientCart.getClient();
+            order.setClient(clientOrder);
 
+            log.info("Полученная корзина {}", clientCart.getCartItems());
             for (CartItem cartItem : clientCart.getCartItems()) {
+                log.info("Блюдо с id {}", cartItem.getId());
                 OrderDish orderDish = OrderDish.builder()
                         .order(order)
                         .dish(cartItem.getDish())
@@ -47,12 +52,8 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.save(order);
             clientCart.getCartItems().clear();
             cartRepository.save(clientCart);
-            return true;
-        } else {
-            return false;
         }
     }
-
 
     @Override
     public void deleteOrder(long id) {
@@ -67,6 +68,4 @@ public class OrderServiceImpl implements OrderService {
             return orderRepository.findOrderByOrderTrackNumber(orderTrackNumber);
         }
     }
-
-
 }

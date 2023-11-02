@@ -1,6 +1,5 @@
 package ru.sovkom.backend.services;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import ru.sovkom.backend.repositories.CartRepository;
 import ru.sovkom.backend.repositories.ClientRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,11 +44,6 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-    @Override
-    public Optional<Client> getClientById(long clientId) {
-
-        return clientRepository.findById(clientId);
-    }
 
     @Override
     public boolean checkClientExistence(long clientId) {
@@ -69,29 +62,7 @@ public class ClientServiceImpl implements ClientService {
         return false;
     }
 
-    @Override
-    public Optional<Client> getClientByEmail(String email) {
 
-        return clientRepository.findUserByEmail(email);
-    }
-
-    @Override
-    public boolean updateClientInfo(long clientId, String name, Date dateOfBirth, String number) {
-        Optional<Client> optionalUser = clientRepository.findById(clientId);
-
-        if (optionalUser.isPresent()) {
-            Client client = optionalUser.get().builder()
-                    .username(name)
-                    .number(number)
-                    .build();
-
-            clientRepository.save(client);
-
-            return true;
-        } else {
-            throw new EntityNotFoundException("Клиент с id " + clientId + " не найден");
-        }
-    }
 
     @Override
     public List<Client> getUsersByUsername(String stringFilter) {
@@ -106,6 +77,7 @@ public class ClientServiceImpl implements ClientService {
     public List<Client> getAllUsers() {
         return clientRepository.findAll();
     }
+
 
     @Override
     public List<CartItem> getClientCart(String clientId) {
@@ -123,13 +95,21 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-    public void addDishToFavorites(Client client, Dish dish) {
+    public boolean addDishToFavorites(Client client, Dish dish) {
         log.info("Добавление избранных блюд вызвалось");
-        client.getDishesFavorites().add(dish);
-        clientRepository.save(client);
+        Set<Dish> favoriteDishes = client.getDishesFavorites();
+
+        boolean isDishInFavorites = favoriteDishes.stream()
+                .anyMatch(favoriteDish -> Objects.equals(favoriteDish.getId(), dish.getId()));
+
+        if (!isDishInFavorites) {
+            favoriteDishes.add(dish);
+            log.info("Блюдо с id {} добавлено в избранное", dish.getId());
+            clientRepository.save(client);
+            return true;
+        } else {
+            log.info("Блюдо уже находится в избранном у клиента");
+            return false;
+        }
     }
-
-
-
-
 }

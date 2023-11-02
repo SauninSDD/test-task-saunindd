@@ -14,6 +14,9 @@ import ru.sovkom.backend.entities.Admin;
 import ru.sovkom.backend.services.AdminService;
 import com.vaadin.flow.data.binder.Binder;
 
+/**
+ * Представление для регистрации администратора.
+ */
 @Route("register")
 @PageTitle("Register")
 @AnonymousAllowed
