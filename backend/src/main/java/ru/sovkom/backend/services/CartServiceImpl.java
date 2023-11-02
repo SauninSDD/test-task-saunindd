@@ -29,8 +29,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public boolean addToCart(long cartId, long dishId, int quantity) {
         Optional<Cart> checkCartClient = cartRepository.findById(cartId);
-        Cart cartClient = checkCartClient.orElse(null);
         if (checkCartClient.isPresent()) {
+            Cart cartClient = checkCartClient.get();
             Optional<CartItem> cartItem = cartClient.getCartItems().stream()
                     .filter(item -> item.getDish().getId() == dishId)
                     .findFirst();
@@ -38,8 +38,8 @@ public class CartServiceImpl implements CartService {
                 cartItem.get().setQuantity(quantity);
             } else {
                 Optional<Dish> checkDish = dishRepository.findDishById(dishId);
-                Dish dish = checkDish.orElse(null);
                 if (checkDish.isPresent()) {
+                    Dish dish = checkDish.get();
                     CartItem newCartItem = CartItem.builder()
                             .cart(cartClient)
                             .dish(dish)
@@ -68,17 +68,14 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void deleteCart(long clientId) {
-        Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
-        if (cart.isPresent()) {
-            long cartId = cart.get().getId();
-            cartRepository.deleteById(cartId);
-        }
+        log.info("Удаление корзины пользователя с ID {}", clientId);
+        cartRepository.deleteCartByClientId(clientId);
     }
 
     @Override
     public Cart getCartIdByClientId(long clientId) {
         Optional<Cart> cart = cartRepository.findCartByClient_Id(clientId);
-        return cart.orElseThrow(() -> new CartNotFoundException("Cart not found for client ID: " + clientId));
+        return cart.orElseThrow(() -> new CartNotFoundException("Корзина не найдена для клиента с ID: " + clientId));
     }
 
 }

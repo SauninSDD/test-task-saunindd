@@ -19,4 +19,10 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
      * @return Объект Optional, содержащий корзину клиента, если она существует.
      */
     Optional<Cart> findCartByClient_Id(long clientId);
+
+    /**
+     * Удаление корзины по id клиента
+     * @param clientId идентификатор пользователя
+     */
+    void deleteCartByClientId(long clientId);
 }
